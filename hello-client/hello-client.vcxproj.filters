@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="generated">
+      <UniqueIdentifier>{cd9f6035-8d7a-45c9-a8cc-db282a49dfa2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\generated\hello.grpc.pb.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\generated\hello.pb.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="hello-client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\generated\hello.grpc.pb.cc">
+      <Filter>generated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\generated\hello.pb.cc">
+      <Filter>generated</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

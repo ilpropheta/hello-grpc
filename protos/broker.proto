@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+service MessageBroker {
+	rpc Send(SendRequest) returns (SendResponse) {}
+	rpc Receive(ReceiveRequest) returns (stream ReceiveResponse) {}
+}
+
+message Message {
+	string topic = 1;
+	string content = 2;
+}
+
+message SendRequest {
+	repeated Message messages = 1;
+}
+
+message SendResponse {
+}
+
+message ReceiveRequest {
+	repeated string topics = 1;
+}
+
+message ReceiveResponse {
+	Message message = 1;
+}

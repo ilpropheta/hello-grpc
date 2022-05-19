@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="generated">
+      <UniqueIdentifier>{c88fb770-fc82-4166-83e1-f12e5bc8ab39}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="streaming-service.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\generated\number.pb.cc">
+      <Filter>generated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\generated\number.grpc.pb.cc">
+      <Filter>generated</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\generated\number.grpc.pb.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\generated\number.pb.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
