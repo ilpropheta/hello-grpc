@@ -2,10 +2,9 @@
 #include <csignal>
 #include <so_5/all.hpp>
 #include <Windows.h>
-#include <fmt/ranges.h>
 #include <utility>
-#include <grpc++/channel.h>
 #include <atomic>
+#include <ranges>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/udp_sink.h>
@@ -20,6 +19,24 @@ using grpc::ClientReaderWriter;
 using grpc::ClientWriter;
 using grpc::Status;
 using namespace grpc;
+
+template<typename T>
+struct std::formatter<google::protobuf::RepeatedPtrField<T>>
+{
+	constexpr auto parse(std::format_parse_context& ctx)
+	{
+		return ctx.begin();
+	}
+
+	auto format(const google::protobuf::RepeatedPtrField<T>& repeated, std::format_context& ctx) const
+	{
+		for (const auto& field : std::views::take(repeated, repeated.size() - 1))
+		{
+			std::format_to(ctx.out(), "{}, ", field);
+		}
+		return std::format_to(ctx.out(), "{}", *prev(repeated.end()));
+	}
+};
 
 class read_agent : public so_5::agent_t
 {
@@ -57,7 +74,6 @@ private:
 		}
 
 		so_subscribe_self().event([this](so_5::mhood_t<connection_check_timeout>) {
-			spdlog::info("tic...");
 			if (m_context->IsCancelled())
 			{
 				spdlog::debug("A client worker detected a client disconnection...will detach");
@@ -120,7 +136,7 @@ public:
 
 	Status Receive(ServerContext* context, const ReceiveRequest* request, ServerWriter<ReceiveResponse>* writer) override
 	{
-		spdlog::debug("A client subscribed to messages on topics '{}'", request->topics());		
+		spdlog::debug("A client subscribed to topics '{}'", request->topics());
 		auto coop = so_environment().make_coop(m_parentCoop, m_binder);
 		const auto agent = coop->make_agent<read_agent>(context, writer, GetChannelsFrom(*request));
 		auto regCoop = so_environment().register_coop(std::move(coop));

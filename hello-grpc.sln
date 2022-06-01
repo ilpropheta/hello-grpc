@@ -15,7 +15,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "streaming-client", "streami
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "message-broker", "message-broker\message-broker.vcxproj", "{DD966AA7-FE2A-4961-A56E-B4998D89CD89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "message-broker-client", "message-broker-client\message-broker-client.csproj", "{F606AF92-6101-40F5-B7B5-BE377729AFE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "message-broker-client", "message-broker-client\message-broker-client.csproj", "{F606AF92-6101-40F5-B7B5-BE377729AFE8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "snowflake-server", "snowflake-server\snowflake-server.vcxproj", "{8BF92935-F398-4C99-BE30-27AFF0941AED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +99,14 @@ Global
 		{F606AF92-6101-40F5-B7B5-BE377729AFE8}.Release|x64.Build.0 = Release|Any CPU
 		{F606AF92-6101-40F5-B7B5-BE377729AFE8}.Release|x86.ActiveCfg = Release|Any CPU
 		{F606AF92-6101-40F5-B7B5-BE377729AFE8}.Release|x86.Build.0 = Release|Any CPU
+		{8BF92935-F398-4C99-BE30-27AFF0941AED}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{8BF92935-F398-4C99-BE30-27AFF0941AED}.Debug|x64.ActiveCfg = Debug|x64
+		{8BF92935-F398-4C99-BE30-27AFF0941AED}.Debug|x64.Build.0 = Debug|x64
+		{8BF92935-F398-4C99-BE30-27AFF0941AED}.Debug|x86.ActiveCfg = Debug|x64
+		{8BF92935-F398-4C99-BE30-27AFF0941AED}.Release|Any CPU.ActiveCfg = Release|x64
+		{8BF92935-F398-4C99-BE30-27AFF0941AED}.Release|x64.ActiveCfg = Release|x64
+		{8BF92935-F398-4C99-BE30-27AFF0941AED}.Release|x64.Build.0 = Release|x64
+		{8BF92935-F398-4C99-BE30-27AFF0941AED}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

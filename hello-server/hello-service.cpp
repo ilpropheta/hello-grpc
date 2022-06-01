@@ -2,7 +2,6 @@
 #include "../generated/hello.grpc.pb.h"
 #include <grpc++/server_builder.h>
 #include <format>
-#include <grpcpp/ext/proto_server_reflection_plugin.h>
 
 class HelloServiceImpl final : public HelloService::Service
 {

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+service SnowflakeServer {
+  rpc NextId (stream NextIdRequest) returns (stream NextIdResponse);
+}
+
+message NextIdRequest {  
+}
+
+message NextIdResponse {
+  int64 value = 1;
+}

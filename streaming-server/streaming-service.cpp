@@ -12,7 +12,7 @@ public:
 		return Status::OK;
 	}
 
-	Status Range(ServerContext* context, const RangeRequest* request, ServerWriter<RangeResponse>* writer) override
+	Status Range([[maybe_unused]]ServerContext* context, const RangeRequest* request, ServerWriter<RangeResponse>* writer) override
 	{
 		RangeResponse response;
 		for (auto i=request->min(); i<request->max(); ++i)
@@ -23,7 +23,7 @@ public:
 		return Status::OK;
 	}
 
-	Status Sum(ServerContext* context, ServerReader<SumRequest>* reader, SumResponse* response) override
+	Status Sum([[maybe_unused]]ServerContext* context, ServerReader<SumRequest>* reader, SumResponse* response) override
 	{
 		uint64_t sum = 0;
 		SumRequest request;

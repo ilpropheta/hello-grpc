@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{ddbbaf0c-0f30-409d-8e45-86a21c47ec8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="generated">
+      <UniqueIdentifier>{0b43d1ee-6271-4549-ba25-094d9b65aeea}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="snowflake-server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\generated\snowflake.pb.cc">
+      <Filter>generated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\generated\snowflake.grpc.pb.cc">
+      <Filter>generated</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\generated\snowflake.grpc.pb.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\generated\snowflake.pb.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="snowflake.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
