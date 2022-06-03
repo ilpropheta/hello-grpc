@@ -55,7 +55,7 @@ namespace MessageBrokerClient
             var source = new CancellationTokenSource();
             await Task.WhenAny(
                 Task.Run(() => { if (Utils.IsConsoleInFocus() && Console.ReadKey().Key == ConsoleKey.Escape) source.Cancel(); }),
-                client.SubscribeAsync(new List<string> { "Channel1", "Channel2" }, x => { Console.WriteLine(x.Content); }, source.Token));
+                client.SubscribeAsync(new List<string> { "Channel1", "Channel2" }, x => { Console.WriteLine($"{x.Topic}: {x.Content}"); }, source.Token));
             
         }
     }
