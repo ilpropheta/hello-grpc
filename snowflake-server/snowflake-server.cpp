@@ -1,33 +1,33 @@
 #include <grpcpp/impl/codegen/server_context.h>
 #include "../generated/snowflake.grpc.pb.h"
 #include <grpc++/server_builder.h>
-#include <stack>
+#include <queue>
 #include "snowflake.h"
 
 using namespace grpc;
 
-class naive_stack
+class id_repo
 {
 public:
-	explicit naive_stack(std::stack<int64_t> s)
+	explicit id_repo(std::queue<int64_t> s)
 		: m_data(std::move(s))
 	{
 		
 	}
 
-	void push(size_t id)
+	void enqueue(size_t id)
 	{
 		return OnLockedResource([=](auto& st) {
 			return st.push(id);
 		});
 	}
 
-	std::optional<int64_t> try_pop()
+	std::optional<int64_t> dequeue()
 	{
 		return OnLockedResource([](auto& st) -> std::optional<int64_t> {
 			if (!st.empty())
 			{
-				auto elem = st.top();
+				auto elem = st.front();
 				st.pop();
 				return elem;
 			}
@@ -44,15 +44,17 @@ private:
 	}
 	
 	std::mutex m_mutex;
-	std::stack<int64_t> m_data;
+	std::queue<int64_t> m_data;
 };
 
-static naive_stack CreateIds()
+using snowflake_t = snowflake<>;
+
+static id_repo CreateSnowflakeWorkerIds()
 {
-	std::stack<int64_t> st;
-	for (auto i = 0u; i <= snowflake<>::MAX_WORKER_ID; ++i)
+	std::queue<int64_t> st;
+	for (auto i = 0u; i <= snowflake_t::MAX_WORKER_ID; ++i)
 		st.push(i);
-	return naive_stack{std::move(st)};
+	return id_repo{std::move(st)};
 }
 
 class SnowflakeServerImpl final : public SnowflakeServer::Service
@@ -66,9 +68,9 @@ public:
 	
 	Status NextId(ServerContext* context, ServerReaderWriter<NextIdResponse, NextIdRequest>* stream) override
 	{
-		if (const auto id = m_ids.try_pop(); id)
+		if (const auto id = m_workerIds.dequeue(); id)
 		{
-			snowflake generator(*id, m_dataCenterId);
+			snowflake_t generator(*id, m_dataCenterId);
 			NextIdRequest request;
 			while (stream->Read(&request))
 			{
@@ -77,25 +79,23 @@ public:
 				stream->Write(response);
 			}
 			std::cout << "WorkerId " << *id << " has finished..." << "\n";
-			m_ids.push(*id);
+			m_workerIds.enqueue(*id);
 			return Status::OK;
 		}
 		return Status{ RESOURCE_EXHAUSTED, "Too many requests..."};
 	}
 private:
-	naive_stack m_ids = CreateIds();
+	id_repo m_workerIds = CreateSnowflakeWorkerIds();
 	size_t m_dataCenterId;
 };
 
 int main()
 {
-	EnableDefaultHealthCheckService(true);
 	SnowflakeServerImpl service{1};
 	ServerBuilder builder;
 	builder.AddListeningPort("localhost:50051", InsecureServerCredentials());
 	builder.RegisterService(&service);
 	auto server = builder.BuildAndStart();
-	server->GetHealthCheckService()->SetServingStatus("HelloService", true);
 	std::cout << "The service is listening! Press Enter to shutdown\n";
 	std::cin.get();
 	server->Shutdown();

@@ -3,8 +3,13 @@
 
 int main()
 {
+	// represents a connection to a certain endpoint (not the connection to any particular services)
 	auto channel = CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
+
+	// the service is here: one stub = one client of a certain service
+	// indeed, the same channel might be shared for interacting with multiple services over the same connection
 	auto stub = HelloService::NewStub(std::move(channel));
+
 	grpc::ClientContext ctx;	
 	HelloRequest request;
 	request.set_name("Marco");
@@ -16,5 +21,6 @@ int main()
 	else
 	{
 		std::cout << "error communicating to the server: " << status.error_code();
+		return status.error_code();
 	}
 }

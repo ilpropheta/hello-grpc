@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "../generated/number_mock.grpc.pb.h"
-#include "../streaming-client/FizzBuzzClient.h"
+#include "../streaming-client/streaming-client.h"
 
 using namespace testing;
 
 // check out here for more info: https://grpc.github.io/grpc/cpp/md_doc_unit_testing.html
 
-TEST(FizzBuzzClientTests, SimpleTest)
+TEST(StreamingClientTests, OnNextShouldReturnFizzBuzzCorrespondingValue)
 {
 	// MockNumberServiceStub is auto-generated with `generate_mock_code=true` when protoc is invoked (but you can define it by hand)
 	auto mock = std::make_unique<MockNumberServiceStub>();
@@ -27,7 +27,7 @@ TEST(FizzBuzzClientTests, SimpleTest)
 		.WillOnce(DoAll(SetArgPointee<2>(fakeResponse2), Return(grpc::Status::OK)))
 		.WillOnce(DoAll(SetArgPointee<2>(fakeResponse3), Return(grpc::Status::OK)));
 
-	const FizzBuzzClient client(std::move(mock));
+	const StreamingClient client(std::move(mock));
 	EXPECT_THAT(client.Next(), Eq("1"));
 	EXPECT_THAT(client.Next(), Eq("2"));
 	EXPECT_THAT(client.Next(), Eq("Fizz"));
@@ -51,7 +51,7 @@ public:
 	MOCK_METHOD0_T(WaitForInitialMetadata, void());
 };
 
-TEST(FizzBuzzClientTests, StreamingTest)
+TEST(StreamingClientTests, OnRangeShouldDoubleTheReceivedValue)
 {
 	// IMPORTANT PATTERN: this is a raw pointer because `NumberService::StubInterface` will wrap it into a unique_ptr
 	//					  StubInterface uses NVI idiom (non-virtual interface)
@@ -83,7 +83,7 @@ TEST(FizzBuzzClientTests, StreamingTest)
 	EXPECT_CALL(*mock2, RangeRaw(_, _))
 		.WillOnce(DoAll(SaveArg<1>(&actualRequest), Return(mock)));
 
-	const FizzBuzzClient client(std::move(mock2));
+	const StreamingClient client(std::move(mock2));
 	std::vector<uint64_t> actuals;
 	client.Range(0, 2, [&](uint64_t value) {
 		actuals.push_back(value);
@@ -91,5 +91,5 @@ TEST(FizzBuzzClientTests, StreamingTest)
 
 	EXPECT_THAT(actualRequest.min(), Eq(0));
 	EXPECT_THAT(actualRequest.max(), Eq(2));
-	EXPECT_THAT(actuals, ElementsAre(1, 2));
+	EXPECT_THAT(actuals, ElementsAre(2, 4));
 }

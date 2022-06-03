@@ -147,12 +147,12 @@
   <ItemGroup>
     <ClCompile Include="..\generated\number.grpc.pb.cc" />
     <ClCompile Include="..\generated\number.pb.cc" />
-    <ClCompile Include="FizzBuzzClient.cpp" />
+    <ClCompile Include="streaming-client.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\generated\number.grpc.pb.h" />
     <ClInclude Include="..\generated\number.pb.h" />
-    <ClInclude Include="FizzBuzzClient.h" />
+    <ClInclude Include="Streaming-client.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

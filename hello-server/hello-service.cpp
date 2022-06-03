@@ -3,6 +3,7 @@
 #include <grpc++/server_builder.h>
 #include <format>
 
+// our implementation of HelloService defined in hello.proto
 class HelloServiceImpl final : public HelloService::Service
 {
 	grpc::Status SayHello(grpc::ServerContext*, const HelloRequest* request, HelloResponse* reply) override
@@ -15,13 +16,11 @@ class HelloServiceImpl final : public HelloService::Service
 
 int main()
 {
-	grpc::EnableDefaultHealthCheckService(true);
 	HelloServiceImpl service;
 	grpc::ServerBuilder builder;
 	builder.AddListeningPort("localhost:50051", grpc::InsecureServerCredentials());
-	builder.RegisterService(&service);
+	builder.RegisterService(&service); // we can add more than one (different) service to the same server!
 	auto server = builder.BuildAndStart();
-	server->GetHealthCheckService()->SetServingStatus("HelloService", true);
 	std::cout << "The service is listening! Press Enter to shutdown\n";
 	std::cin.get();
 	server->Shutdown();

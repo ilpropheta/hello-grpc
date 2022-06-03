@@ -1,4 +1,4 @@
-// adapted from: https://github.com/sniper00/snowflake-cpp
+// freely adapted from: https://github.com/sniper00/snowflake-cpp
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include <chrono>
 #include <stdexcept>
 
+//                       v-- Discord epoch (turn snowflake id to timestamp here https://snowsta.mp/)
 template<int64_t Epoch = 1420070400000L>
 class snowflake
 {
@@ -36,7 +37,7 @@ public:
         if (m_last_timestamp == timestamp)
         {
             m_sequence = (m_sequence + 1) & SEQUENCE_MASK;
-            if (m_sequence == 0)
+            if (m_sequence == 0) // max per-millisecond requests reached
             {
                 timestamp = wait_next_millisecond(m_last_timestamp);
             }
@@ -74,7 +75,7 @@ private:
     static constexpr int64_t WORKER_ID_SHIFT = SEQUENCE_BITS;
     static constexpr int64_t DATACENTER_ID_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS;
     static constexpr int64_t TIMESTAMP_LEFT_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS + DATACENTER_ID_BITS;
-    static constexpr int64_t SEQUENCE_MASK = (1 << SEQUENCE_BITS) - 1;
+    static constexpr int64_t SEQUENCE_MASK = (1 << SEQUENCE_BITS) - 1; // this represents the maximum number of ids per millisecond
 
     using time_point = std::chrono::time_point<std::chrono::steady_clock>;
 

@@ -16,7 +16,7 @@
     <ClCompile Include="..\generated\number.pb.cc">
       <Filter>generated</Filter>
     </ClCompile>
-    <ClCompile Include="FizzBuzzClient.cpp">
+    <ClCompile Include="streaming-client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -27,7 +27,7 @@
     <ClInclude Include="..\generated\number.pb.h">
       <Filter>generated</Filter>
     </ClInclude>
-    <ClInclude Include="FizzBuzzClient.h">
+    <ClInclude Include="Streaming-client.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

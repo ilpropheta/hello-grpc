@@ -11,6 +11,7 @@
 #include "../generated/broker.grpc.pb.h"
 #include "../generated/broker.pb.h"
 #include <grpc++/server_builder.h>
+#include <grpcpp/ext/proto_server_reflection_plugin.h>
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -30,6 +31,8 @@ struct std::formatter<google::protobuf::RepeatedPtrField<T>>
 
 	auto format(const google::protobuf::RepeatedPtrField<T>& repeated, std::format_context& ctx) const
 	{
+		if (repeated.empty())
+			return ctx.out();
 		for (const auto& field : std::views::take(repeated, repeated.size() - 1))
 		{
 			std::format_to(ctx.out(), "{}, ", field);
@@ -116,7 +119,7 @@ class ServiceImpl : public MessageBroker::Service, public so_5::agent_t
 {
 public:
 	ServiceImpl(context_t c)
-		: agent_t(c)
+		: agent_t(std::move(c))
 	{
 		constexpr auto threadPoolSize = 5;
 		spdlog::debug("Starting service with thread pool size={}", threadPoolSize);
@@ -124,7 +127,7 @@ public:
 		m_parentCoop = so_environment().register_coop(so_environment().make_coop(m_binder));
 	}
 
-	Status Send(ServerContext* context, const SendRequest* request, SendResponse* response) override
+	Status Send([[maybe_unused]]ServerContext* context, const SendRequest* request, [[maybe_unused]] SendResponse* response) override
 	{		
 		for (const auto& message : request->messages())
 		{
@@ -179,14 +182,17 @@ int main()
 
 		so_5::wrapped_env_t sobj;
 		auto coop = sobj.environment().make_coop(so_5::disp::active_obj::make_dispatcher(sobj.environment()).binder());
-		const auto agent = coop->make_agent<ServiceImpl>();
+		auto* agent = coop->make_agent<ServiceImpl>();
 		sobj.environment().register_coop(std::move(coop));
 
-		const auto server_address = "localhost:50051";
+		reflection::InitProtoReflectionServerBuilderPlugin();
+		EnableDefaultHealthCheckService(true);
+		const std::string server_address = "localhost:50051";
 		ServerBuilder builder;
 		builder.AddListeningPort(server_address, InsecureServerCredentials());
 		builder.RegisterService(agent);
 		auto server = builder.BuildAndStart();
+		server->GetHealthCheckService()->SetServingStatus("MessageBroker", true);
 		spdlog::info("Server is listening on {}", server_address);
 
 		stop.get_future().wait();

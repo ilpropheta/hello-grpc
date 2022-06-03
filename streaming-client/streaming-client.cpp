@@ -1,9 +1,9 @@
-#include "FizzBuzzClient.h"
+#include "streaming-client.h"
 #include <chrono>
 
 using namespace std::chrono_literals;
 
-FizzBuzzClient::FizzBuzzClient(std::unique_ptr<NumberService::StubInterface> stub)
+StreamingClient::StreamingClient(std::unique_ptr<NumberService::StubInterface> stub)
 	: m_stub(std::move(stub))
 {
 }
@@ -19,7 +19,7 @@ static std::string fizzBuzz(uint64_t n)
 	return std::to_string(n);
 }
 
-std::string FizzBuzzClient::Next() const
+std::string StreamingClient::Next() const
 {
 	grpc::ClientContext ctx;
 	NumberResponse response;
@@ -30,7 +30,7 @@ std::string FizzBuzzClient::Next() const
 	return fizzBuzz(response.value());
 }
 
-void FizzBuzzClient::Range(uint64_t min, uint64_t max, std::function<void(uint64_t)> onValue) const
+void StreamingClient::Range(uint64_t min, uint64_t max, std::function<void(uint64_t)> onValue) const
 {
 	RangeRequest request;
 	request.set_min(min);
@@ -40,12 +40,12 @@ void FizzBuzzClient::Range(uint64_t min, uint64_t max, std::function<void(uint64
 	RangeResponse response;
 	while (reader->Read(&response))
 	{
-		onValue(response.value());
+		onValue(response.value() * 2);
 	}
 	reader->Finish();
 }
 
-uint64_t FizzBuzzClient::Sum(std::span<uint64_t> values) const
+uint64_t StreamingClient::Sum(std::span<uint64_t> values) const
 {
 	grpc::ClientContext ctx;
 	SumResponse response;
