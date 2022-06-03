@@ -16,20 +16,20 @@ As you might image, all the projects need grpc:
 vcpkg install grpc --triplet x64-windows
 ```
 
-For the project message-broker, I have made use of a few extra libraries:
+For the project [message-broker](https://github.com/ilpropheta/hello-grpc/tree/main/message-broker), I have made use of a few extra libraries:
 
 ```
 vcpkg install sobjectizer --triplet x64-windows
 vcpkg install spdlog --triplet x64-windows
 ```
 
-For hello-test I have installed:
+For [hello-test](https://github.com/ilpropheta/hello-grpc/tree/main/hello-test) I have installed:
 
 ```
 vcpkg install gtest --triplet x64-windows
 ```
 
-Finally, remember that message-broker-client is a .Net Core project relying on NuGet official sources.
+Finally, remember that [message-broker-client](https://github.com/ilpropheta/hello-grpc/tree/main/message-broker-client) is a .Net Core project relying on NuGet official sources.
 
 ### Project settings
 
