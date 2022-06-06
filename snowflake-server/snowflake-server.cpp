@@ -61,7 +61,7 @@ static id_repo CreateSnowflakeWorkerIds()
 /* This is a very simple example of bidirectional streaming.
    A snowflake (https://en.wikipedia.org/wiki/Snowflake_ID) is a sequential 64bit unique identifier (invented by Twitter and used also by Discord and Instagram).
    Here, the service is able to generate subsequent snowflakes by assigning the client a free "workerId" (ranging from 0 to 31).
-   A client does the request and then ask for ids. The service replies with snowflakes until the streaming session is up.
+   A client does the request and then ask for ids. The service replies with snowflakes until the streaming has ended.
    When done, the workerId can be reused.
    Multiple clients can simultaneously open a streaming session, thus the access to the repository of free workerIds is (naively) synchronized.
    Since, in the original implementation, snowflake supports up to 32 workerIds, the 33rd streaming request is refused.
