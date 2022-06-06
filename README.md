@@ -2,9 +2,6 @@
 
 Demo project of my talk [A gentle introduction to gRPC](https://www.youtube.com/watch?v=uZUJOsR8pYM).
 
-* TOC
-{:toc}
-
 ## Building
 
 In theory, you can build the sources on any supported platforms.
