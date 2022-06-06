@@ -6,6 +6,7 @@
 
 using namespace grpc;
 
+// naively synchronized queue for our purposes
 class id_repo
 {
 public:
@@ -57,6 +58,14 @@ static id_repo CreateSnowflakeWorkerIds()
 	return id_repo{std::move(st)};
 }
 
+/* This is a very simple example of bidirectional streaming.
+   A snowflake (https://en.wikipedia.org/wiki/Snowflake_ID) is a sequential 64bit unique identifier (invented by Twitter and used also by Discord and Instagram).
+   Here, the service is able to generate subsequent snowflakes by assigning the client a free "workerId" (ranging from 0 to 31).
+   A client does the request and then ask for ids. The service replies with snowflakes until the streaming session is up.
+   When done, the workerId can be reused.
+   Multiple clients can simultaneously open a streaming session, thus the access to the repository of free workerIds is (naively) synchronized.
+   Since, in the original implementation, snowflake supports up to 32 workerIds, the 33rd streaming request is refused.
+*/
 class SnowflakeServerImpl final : public SnowflakeServer::Service
 {
 public:
@@ -91,6 +100,7 @@ private:
 
 int main()
 {
+	//							v-- in the original implementation, this "dataCenterId" (0-31) is just a configurable setting	
 	SnowflakeServerImpl service{1};
 	ServerBuilder builder;
 	builder.AddListeningPort("localhost:50051", InsecureServerCredentials());

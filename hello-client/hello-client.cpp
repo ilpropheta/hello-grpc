@@ -3,10 +3,10 @@
 
 int main()
 {
-	// represents a connection to a certain endpoint (not the connection to any particular services)
+	// represents a connection to a certain endpoint (where many services can be available)
 	auto channel = CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
 
-	// the service is here: one stub = one client of a certain service
+	// the specific service is here: "one stub = one client" of a certain service
 	// indeed, the same channel might be shared for interacting with multiple services over the same connection
 	auto stub = HelloService::NewStub(std::move(channel));
 
