@@ -2,6 +2,9 @@
 
 Demo project of my talk [A gentle introduction to gRPC](https://www.youtube.com/watch?v=uZUJOsR8pYM).
 
+* TOC
+{:toc}
+
 ## Building
 
 In theory, you can build the sources on any supported platforms.
@@ -62,3 +65,56 @@ A few notes on the projects.
     - navigate to **Linker**
     - then to **Input**
     - finally to **Additional Dependencies** and add `Ws2_32.lib` (do not remove `%(AdditionalDependencies)`)
+
+## gRPCurl usage examples
+
+[grpcurl](https://github.com/fullstorydev/grpcurl) is a command-line tool that lets you interact with gRPC servers. It's basically curl for gRPC servers.
+
+Download the latest release from [here](https://github.com/fullstorydev/grpcurl/releases).
+
+All the following examples use [grpc reflection](https://github.com/grpc/grpc/blob/master/doc/server-reflection.md) (but grpcurl supports also compiled protoset files and proto sources).
+
+- List all the services exposed at a certain endpoint:
+
+```
+grpcurl.exe -plaintext localhost:50051 list
+```
+
+- List all the rpc methods of a certain service:
+
+```
+grpcurl.exe -plaintext localhost:50051 list NameOfTheService
+```
+
+- Describe a certain rpc method:
+
+```
+grpcurl.exe -plaintext localhost:50051 describe NameOfTheService.NameOfTheMethod
+```
+
+- Call a certain rpc method (on Windows we need to escape `"` and introduce json with `"` instead of `'`):
+
+```
+grpcurl --plaintext -d "{\"messages\": [ {\"topic\" : \"Channel1\", \"content\" : \"hello\" } ]}" localhost:50051 MessageBroker/Send
+```
+
+## ghz usage examples
+
+[ghz](https://ghz.sh/docs/intro) is a command line utility and Go package for load testing and benchmarking gRPC services.
+
+Download the latest release from [here](https://github.com/bojand/ghz/releases).
+
+All the following examples use [grpc reflection](https://github.com/grpc/grpc/blob/master/doc/server-reflection.md) (but ghz supports also proto sources).
+
+- Simple unary call test:
+
+```
+ghz --insecure --call MessageBroker/Send -d "{\"messages\": [ {\"topic\" : \"Channel1\", \"content\" : \"hello\" } ]}" localhost:50051
+```
+
+- Simple unary call with 20 threads:
+
+```
+ghz --insecure --call MessageBroker/Send -d "{\"messages\": [ {\"topic\" : \"Channel1\", \"content\" : \"hello\" } ]}" -c 20 localhost:50051
+```
+
