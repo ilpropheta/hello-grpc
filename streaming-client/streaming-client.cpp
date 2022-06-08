@@ -42,7 +42,10 @@ void StreamingClient::Range(uint64_t min, uint64_t max, std::function<void(uint6
 	{
 		onValue(response.value() * 2);
 	}
-	reader->Finish();
+	if (const auto status = reader->Finish(); !status.ok())
+	{
+		throw std::runtime_error(std::format("Sum got an error from the service: {}", status.error_message()));
+	}
 }
 
 uint64_t StreamingClient::Sum(std::span<uint64_t> values) const
@@ -59,7 +62,7 @@ uint64_t StreamingClient::Sum(std::span<uint64_t> values) const
 	writer->WritesDone();
 	if (const auto status = writer->Finish(); !status.ok())
 	{
-		throw std::runtime_error(std::format("Sum got an error from service: {}", status.error_details()));
+		throw std::runtime_error(std::format("Sum got an error from the service: {}", status.error_message()));
 	}
 	return response.value();
 }

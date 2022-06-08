@@ -10,7 +10,7 @@ using namespace testing;
 TEST(StreamingClientTests, OnNextShouldReturnFizzBuzzCorrespondingValue)
 {
 	// MockNumberServiceStub is auto-generated with `generate_mock_code=true` when protoc is invoked (but you can define it by hand)
-	auto mock = std::make_unique<MockNumberServiceStub>();
+	auto serviceMock = std::make_unique<MockNumberServiceStub>();
 
 	// fake responses that our mocked services will return to our client
 	NumberResponse fakeResponse1;
@@ -22,12 +22,12 @@ TEST(StreamingClientTests, OnNextShouldReturnFizzBuzzCorrespondingValue)
 
 	// since we have Next(ClientContext*, const NumberRequest&, NumberResponse*)
 	// we can set the third argument to the response we want our service to reply back
-	EXPECT_CALL(*mock, Next(_, _, _))
+	EXPECT_CALL(*serviceMock, Next(_, _, _))
 		.WillOnce(DoAll(SetArgPointee<2>(fakeResponse1), Return(grpc::Status::OK)))
 		.WillOnce(DoAll(SetArgPointee<2>(fakeResponse2), Return(grpc::Status::OK)))
 		.WillOnce(DoAll(SetArgPointee<2>(fakeResponse3), Return(grpc::Status::OK)));
 
-	const StreamingClient client(std::move(mock));
+	const StreamingClient client(std::move(serviceMock));
 	EXPECT_THAT(client.Next(), Eq("1"));
 	EXPECT_THAT(client.Next(), Eq("2"));
 	EXPECT_THAT(client.Next(), Eq("Fizz"));
@@ -55,7 +55,7 @@ TEST(StreamingClientTests, OnRangeShouldDoubleTheReceivedValue)
 {
 	// IMPORTANT PATTERN: this is a raw pointer because `NumberService::StubInterface` will wrap it into a unique_ptr
 	//					  StubInterface uses NVI idiom (non-virtual interface)
-	const auto mock = new MockClientReader<RangeResponse>();
+	const auto clientReaderMock = new MockClientReader<RangeResponse>();
 	// for better clarity, use `owner<T*>` from GSL (or some other type that makes clear you don't have to destroy this pointer)
 	
 	// as before, these are some fakes responses our service will stream back to the client
@@ -65,25 +65,25 @@ TEST(StreamingClientTests, OnRangeShouldDoubleTheReceivedValue)
 	fakeResponse2.set_value(2);
 
 	// Read calls on MockClientReader (the last one will terminate the streaming by returning `false`)
-	EXPECT_CALL(*mock, Read(_))
+	EXPECT_CALL(*clientReaderMock, Read(_))
 		.WillOnce(DoAll(SetArgPointee<0>(fakeResponse1), Return(true)))
 		.WillOnce(DoAll(SetArgPointee<0>(fakeResponse2), Return(true)))
 		.WillOnce(DoAll(SetArgPointee<0>(RangeResponse{}), Return(false)));
 
 	// we also expect Finish will be called from the client
-	EXPECT_CALL(*mock, Finish()).
+	EXPECT_CALL(*clientReaderMock, Finish()).
 		WillOnce(Return(grpc::Status::OK));
 
 	// finally, we prepare the service mock
-	auto mock2 = std::make_unique<MockNumberServiceStub>();
+	auto serviceMock = std::make_unique<MockNumberServiceStub>();
 
 	// `RangeRaw` is the proper name since it returns the "raw" pointer to `ClientReaderInterface`
 	// here we also save the request our client makes and passes to the service to check it's done properly
 	RangeRequest actualRequest;
-	EXPECT_CALL(*mock2, RangeRaw(_, _))
-		.WillOnce(DoAll(SaveArg<1>(&actualRequest), Return(mock)));
+	EXPECT_CALL(*serviceMock, RangeRaw(_, _))
+		.WillOnce(DoAll(SaveArg<1>(&actualRequest), Return(clientReaderMock)));
 
-	const StreamingClient client(std::move(mock2));
+	const StreamingClient client(std::move(serviceMock));
 	std::vector<uint64_t> actuals;
 	client.Range(0, 2, [&](uint64_t value) {
 		actuals.push_back(value);
