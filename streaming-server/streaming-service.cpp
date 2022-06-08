@@ -19,6 +19,7 @@ public:
 		{
 			response.set_value(i);
 			writer->Write(response);
+			std::cout << "[MagicNumberService.Range] wrote: " << i << "\n";
 		}
 		return Status::OK;
 	}
@@ -29,6 +30,7 @@ public:
 		SumRequest request;
 		while (reader->Read(&request))
 		{
+			std::cout << "[MagicNumberService.Sum] read: " << request.value() << "\n";
 			sum += request.value();
 		}
 		response->set_value(sum);

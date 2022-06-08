@@ -54,7 +54,7 @@ uint64_t StreamingClient::Sum(std::span<uint64_t> values) const
 	for (auto i : values)
 	{
 		request.set_value(i);
-		writer->Write(request);
+		writer->Write(request);		
 	}
 	writer->WritesDone();
 	if (const auto status = writer->Finish(); !status.ok())
