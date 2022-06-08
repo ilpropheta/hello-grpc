@@ -33,7 +33,9 @@ Finally, remember that [message-broker-client](https://github.com/ilpropheta/hel
 
 ### Project settings
 
-A few notes on the projects. 
+First of all, since I have [integrated](https://vcpkg.readthedocs.io/en/latest/examples/installing-and-using-packages/#vsmsbuild-project-user-wide-integration) vcpkg, all the include files and libraries are automatically available in my demo projects. Thus, if you are not relying on this feature, you have to explicitly link the libraries and also add additional references to their include files.
+
+A few notes on the projects.
 
 0. Clearly, enable vcpkg on all the projects:
     - Open any project properties
