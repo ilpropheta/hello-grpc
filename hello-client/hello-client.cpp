@@ -10,7 +10,7 @@ int main()
 	// indeed, the same channel might be shared for interacting with multiple services over the same connection
 	auto stub = HelloService::NewStub(std::move(channel));
 
-	grpc::ClientContext ctx;
+	grpc::ClientContext ctx; // can't be reused/shared across calls
 	HelloRequest request;
 	request.set_name("Marco");
 	HelloResponse response;
