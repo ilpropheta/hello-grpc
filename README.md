@@ -1,6 +1,6 @@
 # hello-grpc
 
-Demo project of my talk [A gentle introduction to gRPC](https://www.youtube.com/watch?v=uZUJOsR8pYM).
+Demos of my talk [A gentle introduction to gRPC](https://www.youtube.com/watch?v=uZUJOsR8pYM).
 
 The slides are [here](https://github.com/ilpropheta/hello-grpc/blob/main/gRPC%2B%2B.pdf).
 
@@ -35,7 +35,7 @@ Finally, remember that [message-broker-client](https://github.com/ilpropheta/hel
 
 ### Project settings
 
-First of all, since I have [integrated](https://vcpkg.readthedocs.io/en/latest/examples/installing-and-using-packages/#vsmsbuild-project-user-wide-integration) vcpkg, all the include files and libraries are automatically available in my demo projects. Thus, if you are not relying on this feature, you have to explicitly link the libraries and also add additional references to their include files.
+First of all, since I have [integrated](https://vcpkg.readthedocs.io/en/latest/examples/installing-and-using-packages/#vsmsbuild-project-user-wide-integration) vcpkg, all the include files and libraries are automatically available in my demo projects. Thus, if you are not relying on this feature, you have to explicitly link the libraries and also add additional references to the include files.
 
 A few notes on the projects.
 
@@ -44,7 +44,7 @@ A few notes on the projects.
     - navigate to **vcpkg**
     - then set **Yes** on **Use Vcpkg**
   
-1. Since I am insane pirate, I have turned on the latest features: 
+1. Since I am an insane pirate 🏴‍☠️, I have turned the latest features on:
     - Open any project properties
     - navigate to **C/C++** 
     - then to **Language**
@@ -66,6 +66,8 @@ A few notes on the projects.
     - navigate to **Linker**
     - then to **Input**
     - finally to **Additional Dependencies** and add `Ws2_32.lib` (do not remove `%(AdditionalDependencies)`)
+
+Have fun!
 
 ## gRPCurl usage examples
 
