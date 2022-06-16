@@ -56,13 +56,11 @@ public:
 	{
 	}
 
-	Status Read() const
+	std::future<Status> CompletionStatus()
 	{
-		m_over.wait(m_over.load()); // simple way to just wait for completion
-		spdlog::debug("A client worker has been released");
-		return Status::OK;
+		return m_completed.get_future();
 	}
-
+	
 private:
 	void so_define_agent() override
 	{
@@ -101,8 +99,6 @@ private:
 		m_connectionTimer = {}; // stop the timer (just to avoid any triggers in the middle of agent deactivation)
 		so_deactivate_agent(); // unsubscribe + put in special "inactive" state
 		so_deregister_agent_coop_normally(); // since we have "1 agent = 1 coop", we can directly drop the agent's cooperation to free the associated resources
-		m_over = true; 
-		m_over.notify_all(); // resume the waiting thread
 		spdlog::debug("A client worker detected a client disconnection...detaching procedures done");
 	}
 
@@ -115,14 +111,13 @@ private:
 	void so_evt_finish() override
 	{
 		spdlog::debug("Worker on thread {} finished", GetCurrentThreadId());
-		m_over = true;
-		m_over.notify_all();
+		m_completed.set_value(Status::OK);
 	}
 
 	ServerContext* m_context;
 	ServerWriter<ReceiveResponse>* m_writer;
 	std::vector<so_5::mbox_t> m_channels;
-	std::atomic<bool> m_over = false;
+	std::promise<Status> m_completed;
 	so_5::timer_id_t m_connectionTimer;
 };
 
@@ -160,11 +155,13 @@ public:
 	Status Receive(ServerContext* context, const ReceiveRequest* request, ServerWriter<ReceiveResponse>* writer) override
 	{
 		spdlog::debug("A client subscribed to topics '{}'", request->topics());
-		// new agent's cooperation is a child of the root coop
-		auto coop = so_environment().make_coop(m_rootCoop, m_binder);
-		const auto agent = coop->make_agent<ReceiveAgent>(context, writer, GetChannelsFrom(*request));
-		auto regCoop = so_environment().register_coop(std::move(coop));
-		return agent->Read(); // blocks until the agent is done
+		// as @eao197 (maintainer of SObjectizer) told me in a private conversation,
+		// keeping a pointer to a registered agent is discouraged (and dangerous)
+		// this is a possible approach to keep a state out of the agent
+		// (alternatively, we can use dependency injection/IOC to inject something under our control into the agent)
+		return introduce_child_coop(m_rootCoop, m_binder, [&](so_5::coop_t& coop) {
+			return coop.make_agent<ReceiveAgent>(context, writer, GetChannelsFrom(*request))->CompletionStatus();
+		}).get();
 	}
 private:
 	std::vector<so_5::mbox_t> GetChannelsFrom(const ReceiveRequest& request)
