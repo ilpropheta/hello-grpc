@@ -51,16 +51,11 @@ class ReceiveAgent : public so_5::agent_t
 {
 	struct connection_check_timeout : so_5::signal_t {};
 public:
-	ReceiveAgent(context_t c, ServerContext* context, ServerWriter<ReceiveResponse>* writer, std::vector<so_5::mbox_t> channels)
-		: agent_t(std::move(c)), m_context(context), m_writer(writer), m_channels(std::move(channels))
+	ReceiveAgent(context_t c, std::promise<Status>& completed, ServerContext* context, ServerWriter<ReceiveResponse>* writer, std::vector<so_5::mbox_t> channels)
+		: agent_t(std::move(c)), m_completed(completed), m_context(context), m_writer(writer), m_channels(std::move(channels))
 	{
 	}
 
-	std::future<Status> CompletionStatus()
-	{
-		return m_completed.get_future();
-	}
-	
 private:
 	void so_define_agent() override
 	{
@@ -114,10 +109,10 @@ private:
 		m_completed.set_value(Status::OK);
 	}
 
+	std::promise<Status>& m_completed;
 	ServerContext* m_context;
 	ServerWriter<ReceiveResponse>* m_writer;
 	std::vector<so_5::mbox_t> m_channels;
-	std::promise<Status> m_completed;
 	so_5::timer_id_t m_connectionTimer;
 };
 
@@ -156,12 +151,13 @@ public:
 	{
 		spdlog::debug("A client subscribed to topics '{}'", request->topics());
 		// as @eao197 (maintainer of SObjectizer) told me in a private conversation,
-		// keeping a pointer to a registered agent is discouraged (and dangerous)
-		// this is a possible approach to keep a state out of the agent
-		// (alternatively, we can use dependency injection/IOC to inject something under our control into the agent)
-		return introduce_child_coop(m_rootCoop, m_binder, [&](so_5::coop_t& coop) {
-			return coop.make_agent<ReceiveAgent>(context, writer, GetChannelsFrom(*request))->CompletionStatus();
-		}).get();
+		// keeping a pointer to a registered agent is discouraged (and dangerous).
+		// This is a possible approach to wait until the agent has done.
+		std::promise<Status> completed;
+		introduce_child_coop(m_rootCoop, m_binder, [&](so_5::coop_t& coop) {
+			coop.make_agent<ReceiveAgent>(completed, context, writer, GetChannelsFrom(*request));
+		});
+		return completed.get_future().get();
 	}
 private:
 	std::vector<so_5::mbox_t> GetChannelsFrom(const ReceiveRequest& request)
