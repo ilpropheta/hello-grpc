@@ -86,13 +86,25 @@ grpcurl.exe -plaintext localhost:50051 list
 - List all the rpc methods of a certain service:
 
 ```
-grpcurl.exe -plaintext localhost:50051 list NameOfTheService
+grpcurl.exe -plaintext localhost:50051 list MessageBroker
 ```
 
 - Describe a certain rpc method:
 
 ```
-grpcurl.exe -plaintext localhost:50051 describe NameOfTheService.NameOfTheMethod
+grpcurl.exe -plaintext localhost:50051 describe MessageBroker.Send
+```
+
+- Describe the method's request parameter:
+
+```
+grpcurl.exe -plaintext localhost:50051 describe SendRequest
+```
+
+- Describe the type of a message:
+
+```
+grpcurl.exe -plaintext localhost:50051 describe Message
 ```
 
 - Call a certain rpc method (on Windows we need to escape `"` and introduce json with `"` instead of `'`):
